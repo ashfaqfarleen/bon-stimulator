@@ -1,5 +1,6 @@
 "use client";
 
+import emailjs from "emailjs-com";
 import type React from "react";
 import { useState } from "react";
 import { Slider } from "@/components/ui/slider";
@@ -124,8 +125,30 @@ export default function Home() {
       averageScore: score,
       interpretation,
     };
+    const interpretationColor = averageScore > 3 ? "green" : "red";
 
     try {
+      emailjs.send(
+        `${process.env.NEXT_PUBLIC_SERVICE_ID}`,
+        `${process.env.NEXT_PUBLIC_TEMPLATE_ID}`,
+        {
+          name,
+          email,
+          interpretationColor,
+          averageScore,
+          interpretation,
+          clarity: sliders[0],
+          ownership: sliders[1],
+          alignmentDrift: sliders[2],
+          focusFragmentation: sliders[3],
+          friction: sliders[4],
+          cadence: sliders[5],
+          trustAndSafety: sliders[6],
+          adaptability: sliders[7],
+          momentumData: sliders[8],
+        },
+        `${process.env.NEXT_PUBLIC_PUBLIC_ID}`
+      );
       await fetch(
         `https://formspree.io/f/${process.env.NEXT_PUBLIC_FORMSPREE_ID}`,
         {

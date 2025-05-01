@@ -8,4 +8,17 @@ const getReadinessInterpretation = (score: number): string => {
   return "Execution-Ready – You’re primed for AI-powered execution and leadership acceleration.";
 };
 
-export { getReadinessInterpretation };
+const getColorClass = (value: number = 0) => {
+  if (value <= 1) return "bg-red-500";
+  if (value <= 2) return "bg-yellow-400";
+  if (value <= 3) return "bg-blue-500";
+  return "bg-green-500";
+};
+const getColorClassForSummary = (value: number = 0) => {
+  if (value <= 20) return "bg-red-500";
+  if (value <= 40) return "bg-yellow-400";
+  if (value <= 60) return "bg-blue-500";
+  return "bg-green-500";
+};
+
+export { getReadinessInterpretation, getColorClass, getColorClassForSummary };
