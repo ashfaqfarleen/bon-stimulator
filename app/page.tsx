@@ -22,48 +22,56 @@ import {
   Layers,
 } from "lucide-react";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { getReadinessInterpretation } from "@/lib/helpers";
 
 const BON_DIMENSIONS = [
   {
     name: "Clarity",
-    description: "How clear are goals and expectations",
+    description:
+      "Do people know what we’re doing, why we’re doing it, and how success is measured?",
   },
   {
     name: "Ownership",
-    description: "Level of accountability and responsibility",
+    description:
+      "Are the right people accountable—and do they feel empowered to act?",
   },
   {
     name: "Alignment Drift",
-    description: "How well teams stay aligned with objectives",
+    description:
+      "Is everyone still moving in the same direction—or are we drifting?",
   },
   {
     name: "Focus Fragmentation",
-    description: "Ability to maintain concentrated effort",
+    description:
+      "Is our attention diluted across too many goals, projects, or metrics?",
   },
   {
     name: "Friction",
-    description: "Ease of workflow and collaboration",
+    description: "What bottlenecks, blockers, or slowdowns are we ignoring?",
   },
   {
     name: "Cadence",
-    description: "Rhythm and pace of work execution",
+    description: "Is there a rhythm of execution—or just bursts of energy?",
   },
   {
     name: "Trust & Safety",
-    description: "Psychological safety within teams",
+    description:
+      "Do people feel safe to speak up, push back, and act decisively?",
   },
   {
     name: "Adaptability",
-    description: "Flexibility in response to change",
+    description:
+      "Can the team adjust in motion—or are we rigid in the face of change?",
   },
   {
     name: "Momentum Data",
-    description: "Measurable progress indicators",
+    description:
+      "Are we tracking what actually signals forward motion—not just activity?",
   },
 ];
 
 export default function Home() {
-  const [sliders, setSliders] = useState(Array(BON_DIMENSIONS.length).fill(3));
+  const [sliders, setSliders] = useState(Array(BON_DIMENSIONS.length).fill(1));
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -93,6 +101,7 @@ export default function Home() {
     name: string;
     email: string;
     averageScore: number;
+    interpretation: string;
   }
 
   const handleSubmit = async (
@@ -102,6 +111,8 @@ export default function Home() {
     setIsSubmitting(true);
 
     const score: number = sliders.reduce((a, b) => a + b, 0) / sliders.length;
+    const interpretation: string = getReadinessInterpretation(score);
+
     const sliderRatings: Record<string, number> = {};
     BON_DIMENSIONS.forEach((label, index) => {
       sliderRatings[label.name] = sliders[index];
@@ -111,22 +122,34 @@ export default function Home() {
       email,
       ...sliderRatings,
       averageScore: score,
+      interpretation,
     };
 
     try {
-      await fetch("https://formspree.io/f/xgvkobdy", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+      await fetch(
+        `https://formspree.io/f/${process.env.NEXT_PUBLIC_FORMSPREE_ID}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
       setSubmitted(true);
     } catch (error) {
       console.error("Error submitting form:", error);
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handleReset = () => {
+    setSubmitted(false);
+    setSliders(Array(BON_DIMENSIONS.length).fill(3));
+    setName("");
+    setEmail("");
+    setCurrentStep(0);
   };
 
   const averageScore = sliders.reduce((a, b) => a + b, 0) / sliders.length;
@@ -155,13 +178,13 @@ export default function Home() {
                 Thank you for completing the BON Leadership AI Execution
                 Simulator.
               </p>
-              <div className="bg-slate-50 p-4 rounded-lg inline-block">
+              {/* <div className="bg-slate-50 p-4 rounded-lg inline-block">
                 <div className="text-sm text-slate-500">Your Average Score</div>
                 <div className="text-3xl font-bold text-slate-800">
                   {averageScore.toFixed(1)}/5.0
                 </div>
                 <Progress value={scorePercentage} className="w-full h-2 mt-2" />
-              </div>
+              </div> */}
 
               <div className="mt-8 grid gap-4 sm:grid-cols-3">
                 {BON_DIMENSIONS.map((dimension, index) => (
@@ -253,7 +276,7 @@ export default function Home() {
                     <h2 className="text-xl font-semibold text-slate-800">
                       Execution Dimensions
                     </h2>
-                    <div className="flex items-center gap-2">
+                    {/* <div className="flex items-center gap-2">
                       <span className="text-sm font-medium text-slate-600">
                         Average Score:
                       </span>
@@ -261,7 +284,7 @@ export default function Home() {
                         {averageScore.toFixed(1)}
                       </span>
                       <Progress value={scorePercentage} className="w-24 h-2" />
-                    </div>
+                    </div> */}
                   </div>
 
                   <div className="space-y-6">
@@ -425,7 +448,7 @@ export default function Home() {
                         <h4 className="font-medium text-slate-700 mb-3">
                           Your Assessment Summary
                         </h4>
-                        <div className="flex items-center justify-between mb-2">
+                        {/* <div className="flex items-center justify-between mb-2">
                           <span className="text-sm text-slate-600">
                             Average Score:
                           </span>
@@ -438,7 +461,7 @@ export default function Home() {
                               className="w-24 h-2"
                             />
                           </div>
-                        </div>
+                        </div> */}
                         <div className="grid grid-cols-3 gap-2 mt-4">
                           {BON_DIMENSIONS.map((dimension, index) => (
                             <div
